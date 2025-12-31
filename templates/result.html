@@ -4,7 +4,8 @@
 <head>
   <meta charset="utf-8" />
   <title>Extraction Result - {{ filename }}</title>
-  <link rel="stylesheet" href="{{ url_for('static', path='styles.css') }}" />
+  <link rel="stylesheet"
+    href="{{ url_for('static', path='styles.css') }}?v={{ parse_meta.get('parse_time_ms', '1') }}" />
   <script src="https://pfau-software.de/json-viewer/dist/iife/index.js"></script>
 </head>
 
@@ -53,8 +54,12 @@
     </div>
 
     <div class="pane right glass">
-      <div class="pane-header">
+      <div class="pane-header" style="display: flex; justify-content: space-between; align-items: center;">
         <h3>Extraction</h3>
+        <div class="toggle-group">
+          <button id="btn-json" class="btn-xs active" onclick="setView('json')">JSON</button>
+          <button id="btn-md" class="btn-xs" onclick="setView('markdown')">Markdown</button>
+        </div>
       </div>
       <div class="pane-body scroll">
         {% if error %}
@@ -62,9 +67,43 @@
           <strong>Error:</strong> {{ error }}
         </div>
         {% endif %}
-        <andypf-json-viewer id="json-viewer" expanded="2"></andypf-json-viewer>
+
+        <div id="view-json">
+          <andypf-json-viewer id="json-viewer" expanded="2"></andypf-json-viewer>
+        </div>
+        <div id="view-markdown"
+          style="display: none; padding: 12px; background: #00000020; border-radius: 12px; border: 1px solid var(--border);">
+          <!-- Rendered Markdown container -->
+          <div id="markdown-content" class="markdown-body document-view"></div>
+        </div>
+
+        <!-- Load marked.js for markdown rendering -->
+        <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
         <script>
           document.getElementById("json-viewer").data = {{ extraction_json | safe }};
+
+          // Render markdown
+          const rawMarkdown = `{{ markdown | safe }}`;
+          document.getElementById('markdown-content').innerHTML = marked.parse(rawMarkdown);
+
+          function setView(view) {
+            const jsonView = document.getElementById('view-json');
+            const mdView = document.getElementById('view-markdown');
+            const btnJson = document.getElementById('btn-json');
+            const btnMd = document.getElementById('btn-md');
+
+            if (view === 'json') {
+              jsonView.style.display = 'block';
+              mdView.style.display = 'none';
+              btnJson.classList.add('active');
+              btnMd.classList.remove('active');
+            } else {
+              jsonView.style.display = 'none';
+              mdView.style.display = 'block';
+              btnJson.classList.remove('active');
+              btnMd.classList.add('active');
+            }
+          }
         </script>
       </div>
     </div>

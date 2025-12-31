@@ -236,3 +236,62 @@ details > summary {
     width: auto;
   }
 }
+
+/* Toggle Buttons */
+.btn-xs {
+  padding: 4px 8px;
+  font-size: 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+.btn-xs.active {
+  background: var(--accent);
+  color: #0b0f14;
+  border-color: var(--accent);
+  font-weight: 600;
+}
+.toggle-group {
+    display: flex;
+    gap: 4px;
+    background: #00000022;
+    padding: 4px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+}
+
+/* Markdown Document View */
+.document-view {
+  background-color: white;
+  color: #1a1a1a;
+  padding: 40px;
+  border-radius: 2px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  font-family: 'Georgia', 'Times New Roman', serif;
+  line-height: 1.6;
+  font-size: 16px;
+  min-height: 600px;
+  overflow-y: auto;
+}
+
+.document-view h1, .document-view h2, .document-view h3 {
+  color: #1a1a1a;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.3em;
+}
+
+.document-view code {
+  background-color: #f5f5f5;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+.document-view pre {
+  background-color: #f5f5f5;
+  padding: 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+}

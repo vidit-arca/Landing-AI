@@ -1,4 +1,7 @@
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 import io
 import json
 import uuid
@@ -193,7 +196,7 @@ async def upload(
             )
             extract_resp.raise_for_status()
             result = extract_resp.json()
-            result = extract_resp.json()
+            print(f"DEBUG: Extract response: {json.dumps(result)}") # Debug logging
         except Exception as e:
              # Return error in UI instead of crashing
             print(f"Extract error: {e}")
@@ -204,8 +207,15 @@ async def upload(
         extracted_json_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
         schema_hash_path.write_text(schema_hash, encoding="utf-8")
         extraction = result.get("extraction", result)
+
     elif not markdown:
         extraction = {"error": "No markdown returned from parse"}
+
+    # Clean markdown: remove <::...::> tags
+    if markdown:
+        import re
+        markdown = re.sub(r"<::.*?::>", "", markdown, flags=re.DOTALL)
+        markdown = markdown.strip()
 # In the upload function, change this section:
     # ... (previous code) ...
 
@@ -223,6 +233,7 @@ async def upload(
             "extraction": extraction,
             "extraction_json": json.dumps(extraction, ensure_ascii=False, indent=2),
             "parse_meta": parse_meta,
+            "markdown": markdown, # Pass markdown content
             "filename": dest_path.name,
             "error": extraction.get("error") if isinstance(extraction, dict) else None
         },
@@ -234,6 +245,14 @@ def _guess_content_type(name: str) -> str:
     name_l = name.lower()
     if name_l.endswith(".pdf"):
         return "application/pdf"
-    if any(name_l.endswith(ext) for ext in [".png", ".jpg", ".jpeg", ".gif", ".bmp", ".webp"]):
-        return "image/*"
+    if name_l.endswith(".png"):
+        return "image/png"
+    if name_l.endswith(".jpg") or name_l.endswith(".jpeg"):
+        return "image/jpeg"
+    if name_l.endswith(".webp"):
+        return "image/webp"
+    if name_l.endswith(".gif"):
+        return "image/gif"
+    if name_l.endswith(".bmp"):
+        return "image/bmp"
     return "application/octet-stream"

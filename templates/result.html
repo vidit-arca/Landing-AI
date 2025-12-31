@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <title>Extraction Result - {{ filename }}</title>
-  <link rel="stylesheet" href="http://127.0.0.1:8000/static/styles.css" />
+  <link rel="stylesheet" href="{{ url_for('static', path='styles.css') }}" />
   <script src="https://pfau-software.de/json-viewer/dist/iife/index.js"></script>
 </head>
 

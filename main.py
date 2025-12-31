@@ -73,8 +73,14 @@ SCHEMA: Dict[str, Any] = {
 }
 
 BASE_DIR = Path(__file__).parent.resolve()
-UPLOAD_DIR = BASE_DIR / "uploads"
-CACHE_DIR = BASE_DIR / "caches"
+# Vercel filesystem is read-only, use /tmp for temporary storage
+if os.getenv("VERCEL"):
+    UPLOAD_DIR = Path("/tmp/uploads")
+    CACHE_DIR = Path("/tmp/caches")
+else:
+    UPLOAD_DIR = BASE_DIR / "uploads"
+    CACHE_DIR = BASE_DIR / "caches"
+
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 CACHE_DIR.mkdir(parents=True, exist_ok=True)
 

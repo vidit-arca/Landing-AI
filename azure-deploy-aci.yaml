@@ -1,0 +1,31 @@
+apiVersion: "2021-10-01"
+location: eastus
+name: ade-fastapi-app
+type: Microsoft.ContainerInstance/containerGroups
+properties:
+  containers:
+    - name: ade-fastapi-app
+      properties:
+        image: agenticocr.azurecr.io/ade-fastapi-app:latest
+        ports:
+          - protocol: TCP
+            port: 8000
+        environmentVariables:
+          - name: LANDING_API_KEY
+            secureValue: "YOUR_LANDING_API_KEY"
+        resources:
+          requests:
+            cpu: 2.0
+            memoryInGB: 16
+  imageRegistryCredentials:
+    - server: agenticocr.azurecr.io
+      username: agenticocr
+      password: "YOUR_REGISTRY_PASSWORD"
+  osType: Linux
+  restartPolicy: Always
+  ipAddress:
+    type: Public
+    ports:
+      - protocol: TCP
+        port: 8000
+    dnsNameLabel: ade-fastapi-app-unique

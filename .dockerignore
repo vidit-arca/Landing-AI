@@ -1,0 +1,81 @@
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environment
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Runtime generated directories
+caches/
+uploads/
+*.log
+*.pot
+*.pyc
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Docker files (don't copy Docker config into image)
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Documentation and README files
+README.md
+*.md
+LICENSE
+.editorconfig
+
+# Testing and CI/CD
+.pytest_cache/
+.coverage
+.tox/
+htmlcov/
+.github/
+.gitlab-ci.yml
+.travis.yml
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.bak
+*.swp
+*~.nib

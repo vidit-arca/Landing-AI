@@ -1,0 +1,29 @@
+version: "3.8"
+
+services:
+  fastapi-app:
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ade-fastapi-app
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - LANDING_API_KEY=${LANDING_API_KEY}
+    volumes:
+      - ./uploads:/app/uploads
+      - ./caches:/app/caches
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  app-network:
+    driver: bridge

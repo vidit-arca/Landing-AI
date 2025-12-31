@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <title>Extraction Result - {{ filename }}</title>
+  <link rel="stylesheet" href="http://127.0.0.1:8000/static/styles.css" />
+  <script src="https://pfau-software.de/json-viewer/dist/iife/index.js"></script>
+</head>
+
+<body>
+  <!-- Same header as before -->
+  <header class="toolbar sticky glass">
+    <div class="brand">
+      <a href="/" class="btn btn-ghost">← Back</a>
+      <div class="meta">
+        Pages: {{ parse_meta.get('pages', 'N/A') }} · Parse ms: {{
+        parse_meta.get('parse_time_ms', 'N/A') }}
+      </div>
+    </div>
+    <form action="/" method="get" class="form-inline">
+      <button type="submit" class="btn btn-gradient">New Upload</button>
+    </form>
+  </header>
+
+  <div id="split" class="split">
+    <div class="pane left glass">
+      <div class="pane-header">
+        <h3>Document</h3>
+      </div>
+      <div class="pane-body">
+        {% if content_type == "application/pdf" %}
+        <object data="{{ file_url }}" type="application/pdf" width="100%" height="100%">
+          <embed src="{{ file_url }}" type="application/pdf" />
+          <p>
+            PDF preview not supported.
+            <a class="link" href="{{ file_url }}">Download</a>
+          </p>
+        </object>
+        {% elif "image/" in content_type %}
+        <img src="{{ file_url }}" style="width: 100%; height: 100%; object-fit: contain; display: block;" />
+        {% else %}
+        <p>
+          Preview not supported for this file type.
+          <a class="link" href="{{ file_url }}">Download</a>
+        </p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="gutter">
+      <div class="gutter-dot"></div>
+    </div>
+
+    <div class="pane right glass">
+      <div class="pane-header">
+        <h3>Extraction</h3>
+      </div>
+      <div class="pane-body scroll">
+        <andypf-json-viewer id="json-viewer" expanded="2"></andypf-json-viewer>
+        <script>
+          document.getElementById("json-viewer").data = {{ extraction_json | safe }};
+        </script>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.6.2/split.min.js"></script>
+  <script>
+    Split([".pane.left", ".pane.right"], {
+      sizes: [48, 52],
+      minSize: [280, 360],
+      gutterSize: 14,
+      cursor: "col-resize",
+    });
+  </script>
+</body>
+
+</html>

@@ -5,6 +5,7 @@ import uuid
 import hashlib
 import shutil as _shutil
 import requests
+import base64
 from pathlib import Path
 from typing import Dict, Any
 
@@ -141,8 +142,22 @@ async def upload(
                     timeout=300,
                 )
             parse_resp.raise_for_status()
-        except requests.RequestException as e:
-            raise HTTPException(status_code=502, detail=f"Parse failed: {str(e)}")
+        except Exception as e:
+            # Return error in UI instead of crashing
+            print(f"Parse error: {e}")
+            return templates.TemplateResponse(
+                "result.html",
+                {
+                    "request": request,
+                    "file_url": f"data:{content_type};base64,{base64.b64encode(file_bytes).decode('utf-8')}",
+                    "content_type": content_type,
+                    "extraction": {"error": f"Parse failed: {str(e)}"},
+                    "extraction_json": "{}",
+                    "parse_meta": {},
+                    "filename": dest_path.name,
+                },
+                status_code=200,
+            )
 
         parsed = parse_resp.json()
         markdown = parsed.get("markdown") or ""
@@ -178,8 +193,12 @@ async def upload(
             )
             extract_resp.raise_for_status()
             result = extract_resp.json()
-        except requests.RequestException as e:
-            raise HTTPException(status_code=502, detail=f"Extract failed: {str(e)}")
+            result = extract_resp.json()
+        except Exception as e:
+             # Return error in UI instead of crashing
+            print(f"Extract error: {e}")
+            extraction = {"error": f"Extract failed: {str(e)}"}
+            result = extraction # fallback
 
         # Cache raw provider response; UI will only render 'extraction'
         extracted_json_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -188,19 +207,27 @@ async def upload(
     elif not markdown:
         extraction = {"error": "No markdown returned from parse"}
 # In the upload function, change this section:
+    # ... (previous code) ...
+
+    # Generate Base64 Data URL for preview (bypasses Vercel ephemeral filesystem issues)
+    # We already have file_bytes from line 107
+    b64_content = base64.b64encode(file_bytes).decode("utf-8")
+    file_data_url = f"data:{content_type};base64,{b64_content}"
+
     return templates.TemplateResponse(
-    "result.html",
-    {
-        "request": request,
-        "file_url": f"/uploads/{dest_path.name}",
-        "content_type": content_type,
-        "extraction": extraction,  # ✅ Pass the dict directly
-        "extraction_json": json.dumps(extraction, ensure_ascii=False, indent=2),  # For raw JSON display
-        "parse_meta": parse_meta,
-        "filename": dest_path.name,
-    },
-    status_code=200,
-)
+        "result.html",
+        {
+            "request": request,
+            "file_url": file_data_url, # Use data URL instead of path
+            "content_type": content_type,
+            "extraction": extraction,
+            "extraction_json": json.dumps(extraction, ensure_ascii=False, indent=2),
+            "parse_meta": parse_meta,
+            "filename": dest_path.name,
+            "error": extraction.get("error") if isinstance(extraction, dict) else None
+        },
+        status_code=200,
+    )
 
 
 def _guess_content_type(name: str) -> str:

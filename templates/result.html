@@ -57,6 +57,11 @@
         <h3>Extraction</h3>
       </div>
       <div class="pane-body scroll">
+        {% if error %}
+        <div style="padding: 1rem; background: #fee2e2; color: #991b1b; border-radius: 0.5rem; margin-bottom: 1rem;">
+          <strong>Error:</strong> {{ error }}
+        </div>
+        {% endif %}
         <andypf-json-viewer id="json-viewer" expanded="2"></andypf-json-viewer>
         <script>
           document.getElementById("json-viewer").data = {{ extraction_json | safe }};
